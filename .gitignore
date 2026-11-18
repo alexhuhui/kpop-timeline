@@ -1,0 +1,7 @@
+# Inter font files: install Inter on your computer for the notebook instead.
+Inter/
+.ipynb_checkpoints/
+__pycache__/
+_site/
+.DS_Store
+Thumbs.db

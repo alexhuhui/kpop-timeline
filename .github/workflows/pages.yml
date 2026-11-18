@@ -1,0 +1,44 @@
+name: Deploy to Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Lets the deploy job publish to Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One live deploy at a time. Queued runs wait rather than racing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Only what a browser requests. The notebook, PNGs and rulebooks stay in
+      # the repo but are not published.
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp index.html style.css app.js settings.json groups.csv biases.csv songs.csv _site/
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v5
